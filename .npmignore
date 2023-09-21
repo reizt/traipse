@@ -1,11 +1,8 @@
-/build.mjs
-# /dist
-/env.d.ts
-/index.ts
 /node_modules
-# /package.json
-/src
 /tmp
+/src
+/config
+/.vscode
+
 /tsconfig.json
-/vitest.config.ts
 /yarn.lock

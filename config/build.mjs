@@ -1,12 +1,12 @@
 import { build } from 'esbuild';
 import { resolve } from 'path';
-import pkg from './package.json' assert { type: 'json' };
+import pkg from '../package.json' assert { type: 'json' };
 
 const __dirname = new URL('.', import.meta.url).pathname;
 
 /** @type {import('esbuild').BuildOptions} */
 const opts = {
-  entryPoints: [resolve(__dirname, './index.ts')],
+  entryPoints: [resolve(__dirname, './pkg/index.ts')],
   define: { 'process.env.NODE_ENV': `"${process.env.NODE_ENV}"` },
   target: 'es2022',
   platform: 'node',
