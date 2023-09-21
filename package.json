@@ -1,7 +1,7 @@
 {
   "name": "traipse",
   "private": false,
-  "version": "1.0.5",
+  "version": "1.0.8",
   "repository": {
     "type": "git",
     "url": "https://github.com:reizt/traipse.git"
@@ -12,8 +12,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "/bin/rm -rf dist/**/* && tsc && cp package.json dist && rm dist/tsconfig.tsbuildinfo",
-    "prepare": "npm run build",
+    "build": "/bin/rm -rf dist/**/* && tsc && cp package.json dist && rm -f dist/tsconfig.tsbuildinfo",
     "dev": "nodemon --exec \"yarn build:dev && yarn start:dev\" --watch src --ext ts --delay 0.2",
     "build:dev": "node config/build.mjs development",
     "start:dev": "node --enable-source-maps dist/development.js",
