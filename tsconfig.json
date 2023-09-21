@@ -11,15 +11,15 @@
     // paths
     "baseUrl": "./",
     "outDir": "dist",
-    "paths": {
-      "#/*": ["src/*"]
-    },
 
     // transpilation
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "isolatedModules": true,
+    "sourceMap": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
 
     // diagnostics
     "diagnostics": true,

@@ -1,4 +1,4 @@
-import { welcomeMessage } from '#/welcome';
+import { welcomeMessage } from './welcome';
 
 describe(welcomeMessage.name, () => {
   test('retuned message contains project name', () => {
