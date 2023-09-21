@@ -2,28 +2,33 @@ import type { Endpoint } from '../core/endpoint';
 import { LogicError, LogicErrorBuilder, type LogicErrorCodeDef } from '../core/error';
 import { Failure, Success, type Result } from '../core/result';
 import { buildApiRequest } from './build-api-request';
-import { EndpointError, type Fetcher, type InferClientIn, type InferClientOut } from './types';
+import { FetcherError, type Fetcher, type InferClientIn, type InferClientOut } from './types';
 import { unpackApiResponse } from './unpack-api-response';
 
-export class TraipseClient<F extends Fetcher, ED extends LogicErrorCodeDef> {
+export class TraipseClient<FetcherOptions, F extends Fetcher<FetcherOptions>, ED extends LogicErrorCodeDef> {
   public readonly baseUrl: string;
   public readonly fetcher: F;
   private readonly errorBuilder: LogicErrorBuilder<ED>;
+  private readonly fetcherDefaultOptions?: FetcherOptions;
 
-  constructor(initArgs: { baseUrl: string; fetcher: F; logicErrorCodeDef: ED }) {
+  constructor(initArgs: { baseUrl: string; fetcher: F; logicErrorCodeDef: ED; fetcherDefaultOptions?: FetcherOptions }) {
     this.fetcher = initArgs.fetcher;
     this.baseUrl = initArgs.baseUrl;
     this.errorBuilder = new LogicErrorBuilder(initArgs.logicErrorCodeDef);
+    this.fetcherDefaultOptions = initArgs.fetcherDefaultOptions;
   }
 
-  async request<EP extends Endpoint>(endpoint: EP, input: InferClientIn<EP>): Promise<InferClientOut<EP>> {
+  async request<EP extends Endpoint>(endpoint: EP, input: InferClientIn<EP>, options?: FetcherOptions): Promise<InferClientOut<EP>> {
     try {
+      if (this.fetcherDefaultOptions != null) {
+        options = { ...this.fetcherDefaultOptions, ...options };
+      }
       const request = buildApiRequest(endpoint, input);
-      const response = await this.fetcher(this.baseUrl, request);
+      const response = await this.fetcher(this.baseUrl, request, options);
       const output = unpackApiResponse(endpoint, response);
       return output;
     } catch (err) {
-      if (err instanceof EndpointError && this.errorBuilder.isLogicError(err.body)) {
+      if (err instanceof FetcherError && this.errorBuilder.isLogicError(err.body)) {
         const errorKey = this.errorBuilder.deserializeBody(err.body);
         throw this.errorBuilder.build(errorKey);
       }
@@ -31,9 +36,13 @@ export class TraipseClient<F extends Fetcher, ED extends LogicErrorCodeDef> {
     }
   }
 
-  async safeRequest<EP extends Endpoint>(endpoint: EP, input: InferClientIn<EP>): Promise<Result<InferClientOut<EP>, LogicError<ED>>> {
+  async safeRequest<EP extends Endpoint>(
+    endpoint: EP,
+    input: InferClientIn<EP>,
+    options?: FetcherOptions,
+  ): Promise<Result<InferClientOut<EP>, LogicError<ED>>> {
     try {
-      const output = await this.request(endpoint, input);
+      const output = await this.request(endpoint, input, options);
       return new Success(output);
     } catch (err) {
       if (err instanceof LogicError) {

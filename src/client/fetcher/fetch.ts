@@ -1,5 +1,5 @@
 import { makeRealPath, makeUrl } from '../make-url';
-import { EndpointError, type Fetcher } from '../types';
+import { FetcherError, type Fetcher } from '../types';
 
 export const fetchFetcher: Fetcher<RequestInit> = async (baseUrl, req, options) => {
   const path = makeRealPath(req.path, req.params);
@@ -8,12 +8,6 @@ export const fetchFetcher: Fetcher<RequestInit> = async (baseUrl, req, options) 
   const res = await fetch(url, {
     method: req.method.toUpperCase(),
     body: req.body == null ? null : JSON.stringify(req.body),
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-    mode: 'cors',
-    credentials: 'include',
     ...options,
   });
 
@@ -23,7 +17,7 @@ export const fetchFetcher: Fetcher<RequestInit> = async (baseUrl, req, options) 
   } catch {}
 
   if (!res.ok) {
-    throw new EndpointError(res.statusText, res.status, json);
+    throw new FetcherError(res.statusText, res.status, json);
   }
 
   return {

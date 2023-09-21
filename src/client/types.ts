@@ -10,8 +10,9 @@ export type InferClientIn<T extends Endpoint> = OptionalInfer<T['request']['body
 export type InferClientOut<T extends Endpoint> = OptionalInfer<T['response']['body'], undefined>;
 
 export type Fetcher<Options = never> = (baseUrl: string, req: ApiRequest, options?: Options) => Promise<ApiResponse>;
+export type FetcherOptions<F extends Fetcher> = F extends Fetcher<infer O> ? O : never;
 
-export class EndpointError extends Error {
+export class FetcherError extends Error {
   constructor(
     message: string,
     public readonly status: number,
