@@ -1,0 +1,13 @@
+/node_modules
+
+/dist/*
+/!dist/.gitkeep
+
+/tmp/*
+/!tmp/.gitkeep
+
+/yarn-error.log
+/*.env*
+/.DS_Store
+
+/coverage
