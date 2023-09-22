@@ -9,7 +9,7 @@
     "types": ["vitest/globals"],
 
     // paths
-    "outDir": "dist",
+    "outDir": ".tsc",
 
     // transpilation
     "resolveJsonModule": true,

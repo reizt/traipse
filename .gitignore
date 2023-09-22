@@ -1,13 +1,8 @@
 /node_modules
-
-/dist/*
-/!dist/.gitkeep
-
-/tmp/*
-/!tmp/.gitkeep
-
+/.tsc
+/.build
+/tmp
+/coverage
 /yarn-error.log
 /*.env*
 /.DS_Store
-
-/coverage
