@@ -5,13 +5,13 @@ import { buildApiRequest } from './build-api-request';
 import { FetcherError, type Fetcher, type InferClientIn, type InferClientOut } from './types';
 import { unpackApiResponse } from './unpack-api-response';
 
-export class TraipseClient<FetcherOptions, F extends Fetcher<FetcherOptions>, ED extends LogicErrorCodeDef> {
+export class TraipseClient<FetcherOptions, ErrorDef extends LogicErrorCodeDef> {
   public readonly baseUrl: string;
-  public readonly fetcher: F;
-  private readonly errorBuilder: LogicErrorBuilder<ED>;
+  public readonly fetcher: Fetcher<FetcherOptions>;
+  private readonly errorBuilder: LogicErrorBuilder<ErrorDef>;
   private readonly fetcherDefaultOptions?: FetcherOptions;
 
-  constructor(initArgs: { baseUrl: string; fetcher: F; logicErrorCodeDef: ED; fetcherDefaultOptions?: FetcherOptions }) {
+  constructor(initArgs: { baseUrl: string; fetcher: Fetcher<FetcherOptions>; logicErrorCodeDef: ErrorDef; fetcherDefaultOptions?: FetcherOptions }) {
     this.fetcher = initArgs.fetcher;
     this.baseUrl = initArgs.baseUrl;
     this.errorBuilder = new LogicErrorBuilder(initArgs.logicErrorCodeDef);
@@ -40,7 +40,7 @@ export class TraipseClient<FetcherOptions, F extends Fetcher<FetcherOptions>, ED
     endpoint: EP,
     input: InferClientIn<EP>,
     options?: FetcherOptions,
-  ): Promise<Result<InferClientOut<EP>, LogicError<ED>>> {
+  ): Promise<Result<InferClientOut<EP>, LogicError<ErrorDef>>> {
     try {
       const output = await this.request(endpoint, input, options);
       return new Success(output);
