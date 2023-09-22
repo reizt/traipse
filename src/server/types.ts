@@ -2,21 +2,22 @@ import type { z } from 'zod';
 import type { Endpoint } from '../core/endpoint';
 
 export type Logic<P extends Endpoint> = (input: InferServerIn<P>) => Promise<InferServerOut<P>>;
-export type ServerApp<Es extends Record<string, Endpoint>> = { [E in keyof Es]: Logic<Es[E]> };
 
-type OptionalInfer<T, F> = T extends z.ZodTypeAny ? z.infer<T> : F;
+type NullGuardInfer<T, F> = T extends Record<string, z.ZodTypeAny> ? { [K in keyof T]: z.infer<T[K]> } : F;
 
-export type InferServerIn<T extends Endpoint> = OptionalInfer<T['request']['body'], {}> &
-  OptionalInfer<T['request']['query'], {}> &
-  OptionalInfer<T['request']['params'], {}> &
-  OptionalInfer<T['request']['cookies'], {}>;
+type ReqBody<T extends Endpoint> = T['request']['body'];
+type ReqQuery<T extends Endpoint> = T['request']['query'];
+type ReqParams<T extends Endpoint> = T['request']['params'];
+type ReqCookies<T extends Endpoint> = T['request']['cookies'];
+export type InferServerIn<T extends Endpoint> = NullGuardInfer<ReqBody<T>, {}> &
+  NullGuardInfer<ReqQuery<T>, {}> &
+  NullGuardInfer<ReqParams<T>, {}> &
+  NullGuardInfer<ReqCookies<T>, {}>;
 
-type ResponseBodyOf<T extends Endpoint> = T['response']['body'];
-type ResponseCookiesOf<T extends Endpoint> = T['response']['cookies'];
-export type InferServerOut<T extends Endpoint> = ResponseBodyOf<T> extends z.ZodTypeAny
-  ? ResponseCookiesOf<T> extends z.ZodTypeAny
-    ? z.infer<ResponseBodyOf<T>> & z.infer<ResponseCookiesOf<T>>
-    : z.infer<ResponseBodyOf<T>>
-  : ResponseCookiesOf<T> extends z.ZodTypeAny
-  ? z.infer<ResponseCookiesOf<T>>
-  : void;
+type ResBody<T extends Endpoint> = T['response']['body'];
+type ResCookies<T extends Endpoint> = T['response']['cookies'];
+export type InferServerOut<T extends Endpoint> = ResBody<T> extends undefined
+  ? ResCookies<T> extends undefined
+    ? void
+    : NullGuardInfer<ResCookies<T>, {}>
+  : NullGuardInfer<ResBody<T>, {}>;

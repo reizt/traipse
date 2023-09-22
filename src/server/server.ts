@@ -5,7 +5,7 @@ import { parseOutput } from './parse-output';
 import { parseRequest } from './parse-request';
 import type { Logic } from './types';
 
-export class TraipseBackend<E extends LogicErrorCodeDef> {
+export class TraipseServer<E extends LogicErrorCodeDef> {
   private readonly errorBuilder: LogicErrorBuilder<E>;
 
   constructor(initArgs: { logicErrorCodeDef: E }) {
